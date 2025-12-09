@@ -2,9 +2,11 @@ package edu.neu.curriculumRecommendation.service.impl;
 
 import edu.neu.curriculumRecommendation.dto.CourseDTO;
 import edu.neu.curriculumRecommendation.entity.Course;
+import edu.neu.curriculumRecommendation.exception.ResourceNotFoundException;
 import edu.neu.curriculumRecommendation.mapper.converter.CourseConverter;
 import edu.neu.curriculumRecommendation.mapper.repository.CourseRepository;
 import edu.neu.curriculumRecommendation.service.CourseService;
+import edu.neu.curriculumRecommendation.validator.CourseValidator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,14 +21,23 @@ public class CourseServiceImpl implements CourseService {
 
     private final CourseRepository courseRepository;
     private final CourseConverter courseConverter;
+    private final CourseValidator validator;
 
-    public CourseServiceImpl(CourseRepository courseRepository, CourseConverter courseConverter) {
+    public CourseServiceImpl(CourseRepository courseRepository,
+                             CourseConverter courseConverter,
+                             CourseValidator validator) {
         this.courseRepository = courseRepository;
         this.courseConverter = courseConverter;
+        this.validator = validator;
     }
 
     @Override
     public CourseDTO createCourse(CourseDTO courseDTO) {
+        validator.validateCourseCode(courseDTO.getCourseCode());
+        validator.validateCredits(courseDTO.getCredits());
+        validator.validateDifficulty(courseDTO.getDifficulty());
+        validator.validateDuplicateCourseCode(courseDTO.getCourseCode());
+
         Course course = courseConverter.dtoToEntity(courseDTO);
         Course savedCourse = courseRepository.save(course);
         return courseConverter.entityToDto(savedCourse);
@@ -34,8 +45,12 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public CourseDTO updateCourse(Long id, CourseDTO courseDTO) {
+        validator.validateCourseExists(id);
+        validator.validateCredits(courseDTO.getCredits());
+        validator.validateDifficulty(courseDTO.getDifficulty());
+
         Course course = courseRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Course not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found with id: " + id));
 
         course.setCourseCode(courseDTO.getCourseCode());
         course.setCourseName(courseDTO.getCourseName());
@@ -54,7 +69,7 @@ public class CourseServiceImpl implements CourseService {
     @Transactional(readOnly = true)
     public CourseDTO findById(Long id) {
         Course course = courseRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Course not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found with id: " + id));
         return courseConverter.entityToDto(course);
     }
 
@@ -69,7 +84,7 @@ public class CourseServiceImpl implements CourseService {
     @Transactional(readOnly = true)
     public CourseDTO findByCourseCode(String courseCode) {
         Course course = courseRepository.findByCourseCode(courseCode)
-                .orElseThrow(() -> new RuntimeException("Course not found with courseCode: " + courseCode));
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found with courseCode: " + courseCode));
         return courseConverter.entityToDto(course);
     }
 
