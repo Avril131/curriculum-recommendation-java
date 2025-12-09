@@ -1,5 +1,6 @@
 package edu.neu.curriculumRecommendation.vo.request;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -37,5 +38,32 @@ public class CourseUpdateRequestVO {
     private String semester;
 
     private Boolean isActive;
+
+    private String instructor;
+
+    @Email(message = "Invalid email format")
+    private String instructorEmail;
+
+    private String location;
+
+    private String schedule;
+
+    private String deliveryMode;
+
+    private String workload;
+
+    private String language;
+
+    @Min(value = 1, message = "Capacity must be at least 1")
+    private Integer capacity;
+
+    private String syllabus;
+
+    private String courseUrl;
+
+    private String textbook;
+
+    // Optional: career tags to improve recommendation matching
+    private String careerTags;
 }
 

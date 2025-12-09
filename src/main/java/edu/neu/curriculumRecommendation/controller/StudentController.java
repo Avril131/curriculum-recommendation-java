@@ -1,15 +1,25 @@
 package edu.neu.curriculumRecommendation.controller;
 
+import edu.neu.curriculumRecommendation.dto.CourseDTO;
+import edu.neu.curriculumRecommendation.dto.EnrollmentDTO;
+import edu.neu.curriculumRecommendation.exception.ResourceNotFoundException;
 import edu.neu.curriculumRecommendation.mapper.converter.StudentVOConverter;
+import edu.neu.curriculumRecommendation.mapper.converter.CourseVOConverter;
+import edu.neu.curriculumRecommendation.service.CourseService;
+import edu.neu.curriculumRecommendation.service.EnrollmentService;
 import edu.neu.curriculumRecommendation.service.StudentService;
+import edu.neu.curriculumRecommendation.util.GradeUtil;
 import edu.neu.curriculumRecommendation.vo.request.StudentCreateRequestVO;
 import edu.neu.curriculumRecommendation.vo.request.StudentUpdateRequestVO;
+import edu.neu.curriculumRecommendation.vo.response.CourseResponseVO;
+import edu.neu.curriculumRecommendation.vo.response.EnrollmentResponseVO;
 import edu.neu.curriculumRecommendation.vo.response.StudentResponseVO;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,10 +33,20 @@ public class StudentController {
 
     private final StudentService studentService;
     private final StudentVOConverter voConverter;
+    private final EnrollmentService enrollmentService;
+    private final CourseService courseService;
+    private final CourseVOConverter courseVOConverter;
 
-    public StudentController(StudentService studentService, StudentVOConverter voConverter) {
+    public StudentController(StudentService studentService,
+                             StudentVOConverter voConverter,
+                             EnrollmentService enrollmentService,
+                             CourseService courseService,
+                             CourseVOConverter courseVOConverter) {
         this.studentService = studentService;
         this.voConverter = voConverter;
+        this.enrollmentService = enrollmentService;
+        this.courseService = courseService;
+        this.courseVOConverter = courseVOConverter;
     }
 
     /**
@@ -46,7 +66,7 @@ public class StudentController {
         try {
             StudentResponseVO student = voConverter.dtoToResponse(studentService.findById(id));
             return ResponseEntity.ok(student);
-        } catch (RuntimeException e) {
+        } catch (ResourceNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
     }
@@ -72,7 +92,7 @@ public class StudentController {
                     studentService.updateStudent(id, voConverter.requestToDto(requestVO))
             );
             return ResponseEntity.ok(updatedStudent);
-        } catch (RuntimeException e) {
+        } catch (ResourceNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
     }
@@ -85,7 +105,7 @@ public class StudentController {
         try {
             studentService.deleteStudent(id);
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-        } catch (RuntimeException e) {
+        } catch (ResourceNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
     }
@@ -98,7 +118,7 @@ public class StudentController {
         try {
             StudentResponseVO student = voConverter.dtoToResponse(studentService.findByUserId(userId));
             return ResponseEntity.ok(student);
-        } catch (RuntimeException e) {
+        } catch (ResourceNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
     }

@@ -35,6 +35,32 @@ public class CourseResponseVO {
 
     private Boolean isActive;
 
+    private String instructor;
+
+    private String instructorEmail;
+
+    private String location;
+
+    private String schedule;
+
+    private String deliveryMode;
+
+    private String workload;
+
+    private String language;
+
+    private Integer capacity;
+
+    private Integer currentEnrollment;
+
+    private String syllabus;
+
+    private String courseUrl;
+
+    private String textbook;
+
+    private String careerTags;
+
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;

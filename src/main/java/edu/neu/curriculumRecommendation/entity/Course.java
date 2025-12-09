@@ -47,6 +47,45 @@ public class Course {
     @Column(name = "is_active", nullable = false, columnDefinition = "boolean default true")
     private Boolean isActive = true;
 
+    @Column(name = "instructor", length = 100)
+    private String instructor;
+
+    @Column(name = "instructor_email", length = 100)
+    private String instructorEmail;
+
+    @Column(name = "location", length = 200)
+    private String location;
+
+    @Column(name = "schedule", length = 200)
+    private String schedule;
+
+    @Column(name = "delivery_mode", length = 50)
+    private String deliveryMode;
+
+    @Column(name = "workload", length = 50)
+    private String workload;
+
+    @Column(name = "language", length = 50)
+    private String language;
+
+    @Column(name = "capacity")
+    private Integer capacity;
+
+    @Column(name = "current_enrollment", columnDefinition = "integer default 0")
+    private Integer currentEnrollment = 0;
+
+    @Column(name = "syllabus", columnDefinition = "TEXT")
+    private String syllabus;
+
+    @Column(name = "course_url", length = 500)
+    private String courseUrl;
+
+    @Column(name = "textbook", length = 500)
+    private String textbook;
+
+    @Column(name = "career_tags", length = 500)
+    private String careerTags;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

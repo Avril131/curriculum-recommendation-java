@@ -138,4 +138,17 @@ public class CourseController {
         List<CourseResponseVO> courses = voConverter.dtosToResponses(courseService.findCoursesNotCompletedByStudent(studentId));
         return ResponseEntity.ok(courses);
     }
+
+    /**
+     * Search courses by keyword
+     */
+    @GetMapping("/search")
+    public ResponseEntity<List<CourseResponseVO>> searchCourses(@RequestParam String query) {
+        try {
+            List<CourseResponseVO> courses = voConverter.dtosToResponses(courseService.searchCourses(query));
+            return ResponseEntity.ok(courses);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }

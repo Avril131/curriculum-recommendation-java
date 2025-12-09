@@ -10,6 +10,7 @@ import edu.neu.curriculumRecommendation.validator.CourseValidator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -113,6 +114,16 @@ public class CourseServiceImpl implements CourseService {
     @Transactional(readOnly = true)
     public List<CourseDTO> findCoursesNotCompletedByStudent(Long studentId) {
         List<Course> courses = courseRepository.findCoursesNotCompletedByStudent(studentId);
+        return courseConverter.entitiesToDtos(courses);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CourseDTO> searchCourses(String query) {
+        if (query == null || query.trim().isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<Course> courses = courseRepository.searchCourses(query.trim());
         return courseConverter.entitiesToDtos(courses);
     }
 

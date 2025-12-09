@@ -16,5 +16,7 @@ public interface ProgramRequirementRepository extends JpaRepository<ProgramRequi
     List<ProgramRequirement> findByCourseId(Long courseId);
 
     List<ProgramRequirement> findByMajorAndRequirementType(String major, String requirementType);
+
+    List<ProgramRequirement> findByMajorAndCourseId(String major, Long courseId);
 }
 

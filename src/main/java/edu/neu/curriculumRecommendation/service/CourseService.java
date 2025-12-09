@@ -82,6 +82,14 @@ public interface CourseService {
     List<CourseDTO> findCoursesNotCompletedByStudent(Long studentId);
 
     /**
+     * Search courses by keyword
+     *
+     * @param query keyword
+     * @return List of course DTOs
+     */
+    List<CourseDTO> searchCourses(String query);
+
+    /**
      * Delete course
      *
      * @param id Course ID

@@ -1,6 +1,7 @@
 package edu.neu.curriculumRecommendation.service;
 
 import edu.neu.curriculumRecommendation.dto.RecommendationDTO;
+import edu.neu.curriculumRecommendation.vo.response.RecommendationResponseVO;
 
 import java.util.List;
 
@@ -26,6 +27,24 @@ public interface RecommendationService {
      * @return list of recommendations
      */
     List<RecommendationDTO> generateRecommendations(Long studentId, Integer limit);
+
+    /**
+     * Generate recommendations based on degree requirements (prioritize mandatory courses)
+     *
+     * @param studentId student id
+     * @param limit     max number of recommendations
+     * @return list of recommendation responses
+     */
+    List<RecommendationResponseVO> generateByDegreeRequirements(Long studentId, Integer limit);
+
+    /**
+     * Generate recommendations based on course popularity (enrollment count + average grade)
+     *
+     * @param studentId student id
+     * @param limit     max number of recommendations
+     * @return list of recommendation responses
+     */
+    List<RecommendationResponseVO> generateByPopular(Long studentId, Integer limit);
 
     /**
      * Save a recommendation record
