@@ -2,8 +2,10 @@ package edu.neu.curriculumRecommendation.service.impl;
 
 import edu.neu.curriculumRecommendation.dto.StudentDTO;
 import edu.neu.curriculumRecommendation.entity.Student;
+import edu.neu.curriculumRecommendation.entity.User;
 import edu.neu.curriculumRecommendation.mapper.converter.StudentConverter;
 import edu.neu.curriculumRecommendation.mapper.repository.StudentRepository;
+import edu.neu.curriculumRecommendation.mapper.repository.UserRepository;
 import edu.neu.curriculumRecommendation.service.StudentService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,15 +21,21 @@ public class StudentServiceImpl implements StudentService {
 
     private final StudentRepository studentRepository;
     private final StudentConverter studentConverter;
+    private final UserRepository userRepository;
 
-    public StudentServiceImpl(StudentRepository studentRepository, StudentConverter studentConverter) {
+    public StudentServiceImpl(StudentRepository studentRepository, StudentConverter studentConverter, UserRepository userRepository) {
         this.studentRepository = studentRepository;
         this.studentConverter = studentConverter;
+        this.userRepository = userRepository;
     }
 
     @Override
     public StudentDTO createStudent(StudentDTO studentDTO) {
         Student student = studentConverter.dtoToEntity(studentDTO);
+        // Set user entity from userId
+        User user = userRepository.findById(studentDTO.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + studentDTO.getUserId()));
+        student.setUser(user);
         Student savedStudent = studentRepository.save(student);
         return studentConverter.entityToDto(savedStudent);
     }
