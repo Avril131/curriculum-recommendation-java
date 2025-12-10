@@ -168,12 +168,13 @@ public class RecommendationController {
     }
 
     private RecommendationResponseVO toResponse(RecommendationDTO dto) {
+        Double matchScore = dto.getMatchScore() != null ? Math.round(dto.getMatchScore()) * 1.0 : null;
         return RecommendationResponseVO.builder()
                 .id(dto.getId())
                 .courseId(dto.getCourseId())
                 .courseCode(dto.getCourseCode())
                 .courseName(dto.getCourseName())
-                .matchScore(dto.getMatchScore())
+                .matchScore(matchScore)
                 .reason(dto.getReason())
                 .status(dto.getStatus())
                 .recommendedAt(dto.getRecommendedAt())

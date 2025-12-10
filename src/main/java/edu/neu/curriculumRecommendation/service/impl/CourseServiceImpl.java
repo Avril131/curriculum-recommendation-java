@@ -5,6 +5,7 @@ import edu.neu.curriculumRecommendation.entity.Course;
 import edu.neu.curriculumRecommendation.exception.ResourceNotFoundException;
 import edu.neu.curriculumRecommendation.mapper.converter.CourseConverter;
 import edu.neu.curriculumRecommendation.mapper.repository.CourseRepository;
+import edu.neu.curriculumRecommendation.mapper.repository.EnrollmentRepository;
 import edu.neu.curriculumRecommendation.service.CourseService;
 import edu.neu.curriculumRecommendation.validator.CourseValidator;
 import org.springframework.stereotype.Service;
@@ -23,13 +24,22 @@ public class CourseServiceImpl implements CourseService {
     private final CourseRepository courseRepository;
     private final CourseConverter courseConverter;
     private final CourseValidator validator;
+    private final EnrollmentRepository enrollmentRepository;
 
     public CourseServiceImpl(CourseRepository courseRepository,
                              CourseConverter courseConverter,
-                             CourseValidator validator) {
+                             CourseValidator validator,
+                             EnrollmentRepository enrollmentRepository) {
         this.courseRepository = courseRepository;
         this.courseConverter = courseConverter;
         this.validator = validator;
+        this.enrollmentRepository = enrollmentRepository;
+    }
+
+    private Integer calculateCurrentEnrollment(Long courseId) {
+        Long inProgress = enrollmentRepository.countByCourseIdAndStatus(courseId, "IN_PROGRESS");
+        Long completed = enrollmentRepository.countByCourseIdAndStatus(courseId, "COMPLETED");
+        return (int) (inProgress + completed);
     }
 
     @Override
@@ -71,14 +81,20 @@ public class CourseServiceImpl implements CourseService {
     public CourseDTO findById(Long id) {
         Course course = courseRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Course not found with id: " + id));
-        return courseConverter.entityToDto(course);
+        CourseDTO dto = courseConverter.entityToDto(course);
+        dto.setCurrentEnrollment(calculateCurrentEnrollment(course.getId()));
+        return dto;
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<CourseDTO> findAll() {
         List<Course> courses = courseRepository.findAll();
-        return courseConverter.entitiesToDtos(courses);
+        List<CourseDTO> dtos = courseConverter.entitiesToDtos(courses);
+        for (CourseDTO dto : dtos) {
+            dto.setCurrentEnrollment(calculateCurrentEnrollment(dto.getId()));
+        }
+        return dtos;
     }
 
     @Override
@@ -86,35 +102,53 @@ public class CourseServiceImpl implements CourseService {
     public CourseDTO findByCourseCode(String courseCode) {
         Course course = courseRepository.findByCourseCode(courseCode)
                 .orElseThrow(() -> new ResourceNotFoundException("Course not found with courseCode: " + courseCode));
-        return courseConverter.entityToDto(course);
+        CourseDTO dto = courseConverter.entityToDto(course);
+        dto.setCurrentEnrollment(calculateCurrentEnrollment(course.getId()));
+        return dto;
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<CourseDTO> findByDifficulty(String difficulty) {
         List<Course> courses = courseRepository.findByDifficulty(difficulty);
-        return courseConverter.entitiesToDtos(courses);
+        List<CourseDTO> dtos = courseConverter.entitiesToDtos(courses);
+        for (CourseDTO dto : dtos) {
+            dto.setCurrentEnrollment(calculateCurrentEnrollment(dto.getId()));
+        }
+        return dtos;
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<CourseDTO> findActiveCourses() {
         List<Course> courses = courseRepository.findByIsActiveTrue();
-        return courseConverter.entitiesToDtos(courses);
+        List<CourseDTO> dtos = courseConverter.entitiesToDtos(courses);
+        for (CourseDTO dto : dtos) {
+            dto.setCurrentEnrollment(calculateCurrentEnrollment(dto.getId()));
+        }
+        return dtos;
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<CourseDTO> findByDepartment(String department) {
         List<Course> courses = courseRepository.findByDepartment(department);
-        return courseConverter.entitiesToDtos(courses);
+        List<CourseDTO> dtos = courseConverter.entitiesToDtos(courses);
+        for (CourseDTO dto : dtos) {
+            dto.setCurrentEnrollment(calculateCurrentEnrollment(dto.getId()));
+        }
+        return dtos;
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<CourseDTO> findCoursesNotCompletedByStudent(Long studentId) {
         List<Course> courses = courseRepository.findCoursesNotCompletedByStudent(studentId);
-        return courseConverter.entitiesToDtos(courses);
+        List<CourseDTO> dtos = courseConverter.entitiesToDtos(courses);
+        for (CourseDTO dto : dtos) {
+            dto.setCurrentEnrollment(calculateCurrentEnrollment(dto.getId()));
+        }
+        return dtos;
     }
 
     @Override
@@ -124,7 +158,11 @@ public class CourseServiceImpl implements CourseService {
             return new ArrayList<>();
         }
         List<Course> courses = courseRepository.searchCourses(query.trim());
-        return courseConverter.entitiesToDtos(courses);
+        List<CourseDTO> dtos = courseConverter.entitiesToDtos(courses);
+        for (CourseDTO dto : dtos) {
+            dto.setCurrentEnrollment(calculateCurrentEnrollment(dto.getId()));
+        }
+        return dtos;
     }
 
     @Override

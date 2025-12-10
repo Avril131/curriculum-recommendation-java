@@ -21,5 +21,7 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
     List<Enrollment> findByStudentIdOrderByYearDescSemesterDesc(Long studentId);
 
     boolean existsByStudentIdAndCourseIdAndSemesterAndYear(Long studentId, Long courseId, String semester, Integer year);
+
+    Long countByCourseIdAndStatus(Long courseId, String status);
 }
 

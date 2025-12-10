@@ -332,7 +332,7 @@ public class RecommendationServiceImpl implements RecommendationService {
 
         List<ProgramRequirement> requirements = programRequirementRepository.findByMajor(student.getMajor());
         if (requirements.isEmpty()) {
-            throw new ResourceNotFoundException("No course requirements found for major: " + student.getMajor());
+            return new ArrayList<>();
         }
 
         Set<Long> completedCourseIds = enrollmentRepository
@@ -411,7 +411,7 @@ public class RecommendationServiceImpl implements RecommendationService {
                     .description(course.getDescription())
                     .credits(course.getCredits())
                     .difficulty(course.getDifficulty())
-                    .matchScore(score)
+                    .matchScore((double) Math.round(score))
                     .reason(reason.toString().trim())
                     .status("PENDING")
                     .prerequisiteChain(prerequisiteChain)
@@ -537,7 +537,7 @@ public class RecommendationServiceImpl implements RecommendationService {
                     .description(course.getDescription())
                     .credits(course.getCredits())
                     .difficulty(course.getDifficulty())
-                    .matchScore(score)
+                    .matchScore((double) Math.round(score))
                     .reason(reason.toString().trim())
                     .status("PENDING")
                     .prerequisiteChain(prerequisiteChain)

@@ -6,6 +6,7 @@ import edu.neu.curriculumRecommendation.entity.Enrollment;
 import edu.neu.curriculumRecommendation.entity.Student;
 import edu.neu.curriculumRecommendation.exception.DuplicateResourceException;
 import edu.neu.curriculumRecommendation.exception.ResourceNotFoundException;
+import edu.neu.curriculumRecommendation.exception.ValidationException;
 import edu.neu.curriculumRecommendation.mapper.converter.EnrollmentConverter;
 import edu.neu.curriculumRecommendation.mapper.repository.CourseRepository;
 import edu.neu.curriculumRecommendation.mapper.repository.EnrollmentRepository;
@@ -51,6 +52,15 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         );
         if (exists) {
             throw new DuplicateResourceException("Student already enrolled in this course for this semester");
+        }
+
+        if (course.getCapacity() != null && course.getCapacity() > 0) {
+            Long currentCount = enrollmentRepository.countByCourseIdAndStatus(course.getId(), "IN_PROGRESS")
+                    + enrollmentRepository.countByCourseIdAndStatus(course.getId(), "COMPLETED");
+            if (currentCount >= course.getCapacity()) {
+                throw new ValidationException("Course is full. Capacity: " + course.getCapacity()
+                        + ", Current enrollment: " + currentCount);
+            }
         }
 
         Enrollment enrollment = enrollmentConverter.dtoToEntity(enrollmentDTO);
